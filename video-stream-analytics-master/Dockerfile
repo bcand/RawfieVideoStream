@@ -1,5 +1,8 @@
+FROM wurstmeister/kafka AS kafka
+FROM mesosphere/spark AS spark
 FROM python:3.5 AS builder1
 FROM python:2.7 AS builder2
+
 MAINTAINER bcand
 
 RUN apt-get update \
@@ -54,7 +57,9 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 
 RUN mvn -v \
 	&& java -version \
-	&& python --version 
+	&& python2 --version \ 
+	&& python3 --version \
+	&& ps -ef|grep kafka
 
 RUN mkdir Repo \
 	&& cd Repo \
