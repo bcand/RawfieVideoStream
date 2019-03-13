@@ -294,10 +294,10 @@ RUN mvn -v \
 	&& python3 --version 
 #	&& ps -ef|grep kafka
 
-#RUN mkdir Repo \
-#	&& cd Repo \
-#	&& git clone https://github.com/bcand/RawfieVideoStream.git \
-#	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
-#	&& mvn clean \
-#	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=usr/local/lib/
+RUN mkdir Repo \
+	&& cd Repo \
+	&& git clone https://github.com/bcand/RawfieVideoStream.git \
+	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
+	&& mvn clean \
+	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/usr/local/lib/
 	
