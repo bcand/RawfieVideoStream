@@ -233,6 +233,7 @@ RUN set -ex; \
 
 RUN apt-get update \
 	&& apt-get install -y \
+		apt-utils \
 		build-essential \
        	cmake \
       	git \
@@ -284,8 +285,8 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 	  -DPYTHON_INCLUDE_DIR=$(python3.5 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
 	  -DPYTHON_PACKAGES_PATH=$(python3.5 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") \
 	  .. \
-	&& make install \ 
-	&& make -j
+	&& make install  
+#	&& make -j
 #	&& rm /${OPENCV_VERSION}.zip \
 #	&& rm -r /opencv-${OPENCV_VERSION} 
 
@@ -296,10 +297,10 @@ RUN mvn -v \
 	&& ant -version
 #	&& ps -ef|grep kafka
 
-RUN mkdir Repo \
+#RUN mkdir Repo \
 	&& cd Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
 	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
-	&& mvn clean \
+	&& mvn clean \	
 	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv-3.2.0/cmake_binary/lib
 	
