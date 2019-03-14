@@ -40,7 +40,7 @@ public class VideoEventGenerator implements Runnable {
 	
 	//load OpenCV native lib
 	static {
-		
+		nu.pattern.OpenCV.loadShared();
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 
