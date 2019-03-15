@@ -121,26 +121,26 @@ RUN set -ex \
 	&& python2 --version
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 19.0.3
+#ENV PYTHON_PIP_VERSION 19.0.3
 
-RUN set -ex; \
+#RUN set -ex; \
 	\
-	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
-	\
-	python get-pip.py \
-		--disable-pip-version-check \
-		--no-cache-dir \
-		"pip==$PYTHON_PIP_VERSION" \
-	; \
-	pip --version; \
-	\
-	find /usr/local -depth \
-		\( \
-			\( -type d -a \( -name test -o -name tests \) \) \
-			-o \
-			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
-		\) -exec rm -rf '{}' +; \
-	rm -f get-pip.py
+#	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+#	\
+#	python get-pip.py \
+#		--disable-pip-version-check \
+#		--no-cache-dir \
+#		"pip==$PYTHON_PIP_VERSION" \
+#	; \
+#	pip --version; \
+#	\
+#	find /usr/local -depth \
+#		\( \
+#			\( -type d -a \( -name test -o -name tests \) \) \
+#			-o \
+#			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
+#		\) -exec rm -rf '{}' +; \
+#	rm -f get-pip.py
 
 
 
@@ -266,10 +266,11 @@ WORKDIR /
 ENV OPENCV_VERSION="3.2.0"
 RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 	&& unzip ${OPENCV_VERSION}.zip \
-	&& mkdir /opencv-${OPENCV_VERSION}/cmake_binary \
-	&& cd /opencv-${OPENCV_VERSION}/cmake_binary \
+	&& mv opencv-${OPENCV_VERSION} opencv \
+	&& mkdir /opencv/build \
+	&& cd /opencv/build \
 	&& cmake -DBUILD_TIFF=ON \
-	  -DBUILD_opencv_java=ΟΝ \
+	  -DBUILD_opencv_java=ON \
 	  -DWITH_CUDA=OFF \
 	  -DWITH_OPENGL=ON \
 	  -DWITH_OPENCL=ON \
@@ -285,16 +286,20 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 	  -DPYTHON_INCLUDE_DIR=$(python3.5 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
 	  -DPYTHON_PACKAGES_PATH=$(python3.5 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") \
 	  .. \
-	&& make install  
-#	&& make -j
+	&& make -j \
+	&& make install \
+	&& ldconfig
 #	&& rm /${OPENCV_VERSION}.zip \
 #	&& rm -r /opencv-${OPENCV_VERSION} 
 
 RUN mvn -v \
 	&& java -version \
+	&& echo $JAVA_HOME \
 	&& python2 --version \ 
 	&& python3 --version \
-	&& ant -version
+	&& ant -version \
+	&& export ANT_HOME=/usr/share/ant \
+	&& echo $ANT_HOME
 #	&& ps -ef|grep kafka
 
 #RUN mkdir Repo \
@@ -302,5 +307,5 @@ RUN mvn -v \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
 	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
 	&& mvn clean \	
-	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv-3.2.0/cmake_binary/lib
+	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv/build/lib
 	

@@ -88,8 +88,9 @@ RUN apt-get -y update && \
         libjasper-dev \
         libv4l-dev \
     && \
-    apt-get clean && \
-    rm -rf /opencv /opencv_contrib /var/lib/apt/lists/*
+    apt-get clean 
+# 	&& \
+#    rm -rf /opencv /opencv_contrib /var/lib/apt/lists/*
 
 # Define default command.
 #CMD ["python3 --version"]
@@ -98,12 +99,12 @@ RUN mvn -v \
 	&& java -version \
 	&& python2 --version \ 
 	&& python3 --version 
+	&& ant -version 
 #	&& ps -ef|grep kafka
 
-#RUN mkdir Repo \
-#	&& cd Repo \
-#	&& git clone https://github.com/bcand/RawfieVideoStream.git \
-#	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
-#	&& mvn clean \
-#		&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/usr/local/lib/
-	
+RUN mkdir Repo \
+	&& cd Repo \
+	&& git clone https://github.com/bcand/RawfieVideoStream.git \
+	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
+	&& mvn clean \
+	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv/build/lib/
