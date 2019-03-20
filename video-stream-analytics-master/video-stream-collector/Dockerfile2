@@ -1,32 +1,38 @@
 # https://www.learnopencv.com/install-opencv3-on-ubuntu/
 
 FROM ubuntu:16.04
-LABEL maintainer "jakub.skalecki@gmail.com"
-ENV OPENCV_VERSION 3.2.0
+LABEL maintainer "bbcand@gmail.com"
+ENV OPENCV_VERSION="3.2.0"
 
 # Install all dependencies for OpenCV
 RUN apt-get -y update && \
     apt-get -y install \
-        python3 \
-        python3-dev \
-        git \
+    	apt-utils \
+       	build-essential \
+       	cmake \
+       	pkg-config \
+       	yasm \
+       	git \
+       	g++ \
+       	gcc \
+       	libjpeg8-dev \
+       	libtiff5-dev \
+       	libjasper-dev \
+       	libpng12-dev \
+       	libavcodec-dev \
+       	libavformat-dev \
+       	libswscale-dev \
+       	libv4l-dev \
+       	libxvidcore-dev \
+       	libx264-dev \
+       	libgtk-3-dev \
+       	libatlas-base-dev \
+       	gfortran \
+       	python2.7-dev \
+       	python3.5-dev \
+		git \
         wget \
         unzip \
-        cmake \
-        build-essential \
-        pkg-config \
-        libatlas-base-dev \
-        gfortran \
-        libjasper-dev \
-        libgtk2.0-dev \
-        libavcodec-dev \
-        libavformat-dev \
-        libswscale-dev \
-        libjpeg-dev \
-        libpng-dev \
-        libtiff-dev \
-        libjasper-dev \
-        libv4l-dev \
         openjdk-8-jdk \
         maven \
         ant \
@@ -34,13 +40,14 @@ RUN apt-get -y update && \
 
 # install python dependencies
     wget https://bootstrap.pypa.io/get-pip.py && \
-    python3 get-pip.py && \
+    python3.5 get-pip.py && \
     rm get-pip.py && \
-    pip3 install numpy \
-    && \
+    pip3 install numpy 
+    
 
 # Install OpenCV
-    wget https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip -O opencv3.zip && \
+WORKDIR /
+RUN wget https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip -O opencv3.zip && \
     unzip -q opencv3.zip && \
     mv /opencv-$OPENCV_VERSION /opencv && \
     rm opencv3.zip && \
@@ -52,17 +59,11 @@ RUN apt-get -y update && \
 
 # Prepare build
     mkdir /opencv/build && cd /opencv/build && \
-    cmake -D CMAKE_BUILD_TYPE=RELEASE \
-      -D BUILD_PYTHON_SUPPORT=ON \
-      -D CMAKE_INSTALL_PREFIX=/usr/local \
-      -D OPENCV_EXTRA_MODULES_PATH=/opencv_contrib/modules \
-      -D BUILD_EXAMPLES=OFF \
-      -D PYTHON_DEFAULT_EXECUTABLE=/usr/bin/python3 \
-      -D BUILD_opencv_python3=ON \
-      -D BUILD_opencv_python2=OFF \
-      -D WITH_IPP=OFF \
-      -D WITH_FFMPEG=ON \
-      -D WITH_V4L=ON .. \
+#    --DBUILD_PERF_TESTS=OFF \
+    cmake -DBUILD_SHARED_LIBRARY=OFF \
+		-DBUILD_TESTS=OFF \
+		-DBUILD_opencv_python=OFF \
+		-DCMAKE_BUILD_TYPE=RELEASE \
     && \
 
 # Install
@@ -73,22 +74,22 @@ RUN apt-get -y update && \
     && \
 
 # Clean
-    apt-get -y remove \
-        python3-dev \
-        libatlas-base-dev \
-        gfortran \
-        libjasper-dev \
-        libgtk2.0-dev \
-        libavcodec-dev \
-        libavformat-dev \
-        libswscale-dev \
-        libjpeg-dev \
-        libpng-dev \
-        libtiff-dev \
-        libjasper-dev \
-        libv4l-dev \
-    && \
-    apt-get clean 
+#    apt-get -y remove \
+#        python3-dev \
+#        libatlas-base-dev \
+#        gfortran \
+#        libjasper-dev \
+#        libgtk2.0-dev \
+#        libavcodec-dev \
+#        libavformat-dev \
+#        libswscale-dev \
+#        libjpeg-dev \
+#        libpng-dev \
+#        libtiff-dev \
+#        libjasper-dev \
+#        libv4l-dev \
+#   && \
+#    apt-get clean 
 # 	&& \
 #    rm -rf /opencv /opencv_contrib /var/lib/apt/lists/*
 
@@ -98,7 +99,7 @@ RUN apt-get -y update && \
 RUN mvn -v \
 	&& java -version \
 	&& python2 --version \ 
-	&& python3 --version 
+	&& python3 --version \
 	&& ant -version 
 #	&& ps -ef|grep kafka
 
@@ -107,4 +108,4 @@ RUN mkdir Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
 	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
 	&& mvn clean \
-	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv/build/lib/
+	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv/build/lib

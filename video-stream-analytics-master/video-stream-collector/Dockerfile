@@ -1,5 +1,8 @@
 #FROM python:3.5.6-stretch AS Rawfie
-FROM buildpack-deps:stretch AS Rawfie
+#FROM buildpack-deps:stretch-slim AS Rawfie
+FROM debian:stretch-slim AS Rawfie
+#FROM arm64v8:stretch AS Rawfie_ARM64v8
+#FROM scratch AS Rawfie_ARM64v8
 
 MAINTAINER bcand
 
@@ -121,26 +124,26 @@ RUN set -ex \
 	&& python2 --version
 
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-#ENV PYTHON_PIP_VERSION 19.0.3
+ENV PYTHON_PIP_VERSION 19.0.3
 
-#RUN set -ex; \
+RUN set -ex; \
 	\
-#	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
-#	\
-#	python get-pip.py \
-#		--disable-pip-version-check \
-#		--no-cache-dir \
-#		"pip==$PYTHON_PIP_VERSION" \
-#	; \
-#	pip --version; \
-#	\
-#	find /usr/local -depth \
-#		\( \
-#			\( -type d -a \( -name test -o -name tests \) \) \
-#			-o \
-#			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
-#		\) -exec rm -rf '{}' +; \
-#	rm -f get-pip.py
+	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+	\
+	python get-pip.py \
+		--disable-pip-version-check \
+		--no-cache-dir \
+		"pip==$PYTHON_PIP_VERSION" \
+	; \
+	pip --version; \
+	\
+	find /usr/local -depth \
+		\( \
+			\( -type d -a \( -name test -o -name tests \) \) \
+			-o \
+			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
+		\) -exec rm -rf '{}' +; \
+	rm -f get-pip.py
 
 
 
@@ -205,27 +208,7 @@ RUN set -ex \
 #	&& ln -s python3 python \
 #	&& ln -s python3-config python-config
 
-# if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 19.0.3
 
-RUN set -ex; \
-	\
-	wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
-	\
-	python get-pip.py \
-		--disable-pip-version-check \
-		--no-cache-dir \
-		"pip==$PYTHON_PIP_VERSION" \
-	; \
-	pip --version; \
-	\
-	find /usr/local -depth \
-		\( \
-			\( -type d -a \( -name test -o -name tests \) \) \
-			-o \
-			\( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
-		\) -exec rm -rf '{}' +; \
-	rm -f get-pip.py
 
 
 	
@@ -269,28 +252,21 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 	&& mv opencv-${OPENCV_VERSION} opencv \
 	&& mkdir /opencv/build \
 	&& cd /opencv/build \
-	&& cmake -DBUILD_TIFF=ON \
-	  -DBUILD_opencv_java=ON \
-	  -DWITH_CUDA=OFF \
-	  -DWITH_OPENGL=ON \
-	  -DWITH_OPENCL=ON \
-	  -DWITH_IPP=ON \
-	  -DWITH_TBB=ON \
-	  -DWITH_EIGEN=ON \
-	  -DWITH_V4L=ON \
-	  -DBUILD_TESTS=OFF \
-	  -DBUILD_PERF_TESTS=OFF \
-	  -DCMAKE_BUILD_TYPE=RELEASE \
-	  -DCMAKE_INSTALL_PREFIX=$(python3.5 -c "import sys; print(sys.prefix)") \
-	  -DPYTHON_EXECUTABLE=$(which python3.5) \
-	  -DPYTHON_INCLUDE_DIR=$(python3.5 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
-	  -DPYTHON_PACKAGES_PATH=$(python3.5 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") \
-	  .. \
-	&& make -j \
-	&& make install \
-	&& ldconfig
-#	&& rm /${OPENCV_VERSION}.zip \
-#	&& rm -r /opencv-${OPENCV_VERSION} 
+	&& cmake -DBUILD_PERF_TESTS=OFF \
+		-DBUILD_SHARED_LIBRARY=OFF \
+		-DBUILD_TESTS=OFF \
+		-DBUILD_opencv_python=OFF \
+		-DCMAKE_BUILD_TYPE=RELEASE \
+	 	.. \
+	&& make -j8 \
+#	for x86_64	
+#	&& cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/ \
+#	for arm
+	&& cp lib/libopencv_java320.so /usr/lib/arm-linux-gnueabihf \
+#	&& make install \
+#	&& ldconfig
+	&& rm /${OPENCV_VERSION}.zip 
+#	&& rm -r /opencv 
 
 RUN mvn -v \
 	&& java -version \
@@ -302,10 +278,14 @@ RUN mvn -v \
 	&& echo $ANT_HOME
 #	&& ps -ef|grep kafka
 
-#RUN mkdir Repo \
+#RUN cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/
+# mkdir /opencv-java-bin \
+#	cp bin/opencv-320.jar lib/libopencv_java320.so /opencv-java-bin/ \
+
+RUN mkdir Repo \
 	&& cd Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
 	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
-	&& mvn clean \	
-	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv/build/lib
-	
+#	&& mvn clean \	
+	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false 
+#	-Djava.library.path=/opencv/build/lib	
