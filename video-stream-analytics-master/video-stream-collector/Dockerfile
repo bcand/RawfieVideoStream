@@ -6,6 +6,11 @@ FROM debian:stretch-slim AS Rawfie
 
 MAINTAINER bcand
 
+# Install Java 8
+RUN apt-get update \
+	&& apt-get install -y \
+       	openjdk-8-jdk \
+
 # Libs	
 
 RUN apt-get update \
@@ -33,13 +38,11 @@ RUN apt-get update \
        	libatlas-base-dev \
        	gfortran \
        	libpq-dev \
-       	openjdk-8-jdk \
 		ant \
 		maven \
     && rm -rf /var/lib/apt/lists/*
     
     
-# Install Java 8
 
 
 # Install Python 2.7
