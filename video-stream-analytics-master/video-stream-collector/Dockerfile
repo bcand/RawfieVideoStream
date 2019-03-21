@@ -1,6 +1,6 @@
 #FROM python:3.5.6-stretch AS Rawfie
-FROM buildpack-deps:stretch AS Rawfie
-#FROM debian:stretch-slim AS Rawfie
+#FROM buildpack-deps:stretch AS Rawfie
+FROM debian:stretch-slim AS Rawfie
 #FROM arm64v8:stretch AS Rawfie_ARM64v8
 #FROM scratch AS Rawfie_ARM64v8
 
@@ -260,9 +260,9 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 	 	.. \
 	&& make -j8 \
 #	for x86_64	
-	&& cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/ \
+#	&& cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/ \
 #	for arm
-#	&& cp lib/libopencv_java320.so /usr/lib/arm-linux-gnueabihf \
+	&& cp lib/libopencv_java320.so /usr/lib/arm-linux-gnueabihf \
 #	&& make install \
 #	&& ldconfig
 	&& rm /${OPENCV_VERSION}.zip 
