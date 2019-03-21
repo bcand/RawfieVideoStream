@@ -1,13 +1,15 @@
 #FROM python:3.5.6-stretch AS Rawfie
 #FROM buildpack-deps:stretch AS Rawfie
-FROM debian:stretch-slim AS Rawfie
+FROM debian:stretch AS Rawfie
 
 MAINTAINER bcand
 
 # Install Java 8
 RUN apt-get update \
 	&& apt-get install -y \
-       	openjdk-8-jdk \
+       	openjdk-8-jdk 
+    && rm -rf /var/lib/apt/lists/*
+
 
 # Libs	
 
