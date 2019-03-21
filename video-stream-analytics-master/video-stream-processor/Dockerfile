@@ -4,6 +4,41 @@ FROM debian:stretch-slim AS Rawfie
 
 MAINTAINER bcand
 
+
+# Libs	
+
+RUN apt-get update \
+	&& apt-get install -y \
+		apt-utils \
+		build-essential \
+       	cmake \
+      	git \
+       	wget \
+       	unzip \
+       	yasm \
+       	pkg-config \
+       	libswscale-dev \
+       	libtbb2 \
+       	libtbb-dev \
+       	libjpeg-dev \
+       	libpng-dev \
+       	libtiff-dev \
+       	libavformat-dev \
+       	libavcodec-dev \
+       	libswscale-dev \
+       	libv4l-dev \
+       	libxvidcore-dev \
+       	libx264-dev \
+       	libatlas-base-dev \
+       	gfortran \
+       	libpq-dev \
+       	openjdk-8-jdk \
+		ant \
+		maven \
+		scala \
+    && rm -rf /var/lib/apt/lists/*
+
+
 # Install Java 8
 
 
@@ -149,38 +184,6 @@ RUN set -ex \
 
 
 	
-# Libs	
-
-RUN apt-get update \
-	&& apt-get install -y \
-		apt-utils \
-		build-essential \
-       	cmake \
-      	git \
-       	wget \
-       	unzip \
-       	yasm \
-       	pkg-config \
-       	libswscale-dev \
-       	libtbb2 \
-       	libtbb-dev \
-       	libjpeg-dev \
-       	libpng-dev \
-       	libtiff-dev \
-       	libavformat-dev \
-       	libavcodec-dev \
-       	libswscale-dev \
-       	libv4l-dev \
-       	libxvidcore-dev \
-       	libx264-dev \
-       	libatlas-base-dev \
-       	gfortran \
-       	libpq-dev \
-       	openjdk-8-jdk \
-		ant \
-		maven \
-		scala \
-    && rm -rf /var/lib/apt/lists/*
 
 RUN pip install numpy
 
