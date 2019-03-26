@@ -70,7 +70,7 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 	&& mkdir /opencv/build \
 	&& cd /opencv/build \
 	&& cmake -DBUILD_PERF_TESTS=OFF \
-		-DWITH_FFMPEG=OFF \
+#		-DWITH_FFMPEG=OFF \
 		-DBUILD_SHARED_LIBRARY=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_opencv_python=OFF \
@@ -93,7 +93,8 @@ RUN mvn -v \
 	&& python3 --version \
 	&& ant -version \
 	&& export ANT_HOME=/usr/share/ant \
-	&& echo $ANT_HOME
+	&& echo $ANT_HOME \
+	&& ffmpeg -version 
 #	&& ps -ef|grep kafka
 
 #RUN cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/
@@ -103,7 +104,7 @@ RUN mvn -v \
 RUN mkdir Repo \
 	&& cd Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
-	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector 
-#	&& mvn clean \	
+	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
+	&& mvn clean install 
 #	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false 
 #	-Djava.library.path=/opencv/build/lib	
