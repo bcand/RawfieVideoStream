@@ -3,8 +3,6 @@ FROM debian:stretch AS Rawfie
 
 MAINTAINER bcand
 
-
-
 # Install Java 8
 RUN apt-get update \
 	&& apt-get install -y \
@@ -13,7 +11,8 @@ RUN apt-get update \
        	python-pip \
        	python3 \
     && rm -rf /var/lib/apt/lists/*
-
+    
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-armhf
 
 # Libs	
 
@@ -42,6 +41,7 @@ RUN apt-get update \
        	libatlas-base-dev \
        	gfortran \
        	libpq-dev \
+       	ffmpeg \
 		ant \
 		maven \
     && rm -rf /var/lib/apt/lists/*
@@ -70,16 +70,17 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 	&& mkdir /opencv/build \
 	&& cd /opencv/build \
 	&& cmake -DBUILD_PERF_TESTS=OFF \
+		-DWITH_FFMPEG=OFF \
 		-DBUILD_SHARED_LIBRARY=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_opencv_python=OFF \
 		-DCMAKE_BUILD_TYPE=RELEASE \
 	 	.. \
-	&& make -j8 \
+	&& make -j4 \
 #	for x86_64	
-	&& cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/ \
+#	&& cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/ \
 #	for arm
-#	&& cp lib/libopencv_java320.so /usr/lib/arm-linux-gnueabihf \
+	&& cp lib/libopencv_java320.so /usr/lib/arm-linux-gnueabihf \
 #	&& make install \
 #	&& ldconfig
 	&& rm /${OPENCV_VERSION}.zip 
@@ -102,7 +103,7 @@ RUN mvn -v \
 RUN mkdir Repo \
 	&& cd Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
-	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
+	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector 
 #	&& mvn clean \	
-	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false 
+#	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false 
 #	-Djava.library.path=/opencv/build/lib	

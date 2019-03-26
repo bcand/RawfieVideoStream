@@ -40,8 +40,6 @@ public class VideoEventGenerator implements Runnable {
 	
 	//load OpenCV native lib
 	static {
-		System.out.printf("java.library.path: %s%n",
-                System.getProperty("java.library.path"));
 		System.out.println(Core.NATIVE_LIBRARY_NAME);
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}

@@ -1,111 +1,108 @@
-# https://www.learnopencv.com/install-opencv3-on-ubuntu/
+FROM alpine:latest AS Rawfie
+#FROM debian:stretch AS Rawfie
 
-FROM ubuntu:16.04
-LABEL maintainer "bbcand@gmail.com"
-ENV OPENCV_VERSION="3.2.0"
+MAINTAINER bcand
 
-# Install all dependencies for OpenCV
-RUN apt-get -y update && \
-    apt-get -y install \
-    	apt-utils \
-       	build-essential \
+# Install Java 8
+RUN apk update
+
+RUN apk fetch openjdk8
+
+RUN apk add openjdk8
+
+RUN apk add --no-cache \
+       	python \
+       	py-pip \
+       	python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# Libs	
+RUN apk --update add gcc \
+		make \
+		g++ \
+		zlib-dev \
        	cmake \
-       	pkg-config \
+      	git \
+       	wget \
+       	unzip \
        	yasm \
-       	git \
-       	g++ \
-       	gcc \
-       	libjpeg8-dev \
-       	libtiff5-dev \
-       	libjasper-dev \
-       	libpng12-dev \
-       	libavcodec-dev \
+       	libswscale-dev \
+       	libtbb2 \
+       	libtbb-dev \
+       	libjpeg-dev \
+       	libpng-dev \
+       	libtiff-dev \
        	libavformat-dev \
+       	libavcodec-dev \
        	libswscale-dev \
        	libv4l-dev \
        	libxvidcore-dev \
        	libx264-dev \
-       	libgtk-3-dev \
        	libatlas-base-dev \
        	gfortran \
-       	python2.7-dev \
-       	python3.5-dev \
-		git \
-        wget \
-        unzip \
-        openjdk-8-jdk \
-        maven \
-        ant \
-    && \
-
-# install python dependencies
-    wget https://bootstrap.pypa.io/get-pip.py && \
-    python3.5 get-pip.py && \
-    rm get-pip.py && \
-    pip3 install numpy 
+       	libpq-dev \
+		apache-ant \
+		maven \
+    && rm -rf /var/lib/apt/lists/*
+    
     
 
-# Install OpenCV
-WORKDIR /
-RUN wget https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip -O opencv3.zip && \
-    unzip -q opencv3.zip && \
-    mv /opencv-$OPENCV_VERSION /opencv && \
-    rm opencv3.zip && \
-    wget https://github.com/opencv/opencv_contrib/archive/$OPENCV_VERSION.zip -O opencv_contrib3.zip && \
-    unzip -q opencv_contrib3.zip && \
-    mv /opencv_contrib-$OPENCV_VERSION /opencv_contrib && \
-    rm opencv_contrib3.zip \
-    && \
 
-# Prepare build
-    mkdir /opencv/build && cd /opencv/build && \
-#    --DBUILD_PERF_TESTS=OFF \
-    cmake -DBUILD_SHARED_LIBRARY=OFF \
+# Install Python 2.7
+
+
+
+
+
+# Install python 3.5
+
+	
+
+
+RUN pip install numpy
+
+WORKDIR /
+ENV OPENCV_VERSION="3.2.0"
+RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
+	&& unzip ${OPENCV_VERSION}.zip \
+	&& mv opencv-${OPENCV_VERSION} opencv \
+	&& mkdir /opencv/build \
+	&& cd /opencv/build \
+	&& cmake -DBUILD_PERF_TESTS=OFF \
+		-DBUILD_SHARED_LIBRARY=OFF \
 		-DBUILD_TESTS=OFF \
 		-DBUILD_opencv_python=OFF \
 		-DCMAKE_BUILD_TYPE=RELEASE \
-    && \
-
-# Install
-    cd /opencv/build && \
-    make -j$(nproc) && \
-    make install && \
-    ldconfig \
-    && \
-
-# Clean
-#    apt-get -y remove \
-#        python3-dev \
-#        libatlas-base-dev \
-#        gfortran \
-#        libjasper-dev \
-#        libgtk2.0-dev \
-#        libavcodec-dev \
-#        libavformat-dev \
-#        libswscale-dev \
-#        libjpeg-dev \
-#        libpng-dev \
-#        libtiff-dev \
-#        libjasper-dev \
-#        libv4l-dev \
-#   && \
-#    apt-get clean 
-# 	&& \
-#    rm -rf /opencv /opencv_contrib /var/lib/apt/lists/*
-
-# Define default command.
-#CMD ["python3 --version"]
+	 	.. \
+	&& make -j8 \
+#	for x86_64	
+	&& cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/ \
+#	for arm
+#	&& cp lib/libopencv_java320.so /usr/lib/arm-linux-gnueabihf \
+#	&& make install \
+#	&& ldconfig
+	&& rm /${OPENCV_VERSION}.zip 
+#	&& rm -r /opencv 
 
 RUN mvn -v \
 	&& java -version \
+	&& echo $JAVA_HOME \
 	&& python2 --version \ 
 	&& python3 --version \
-	&& ant -version 
+	&& ant -version \
+	&& export ANT_HOME=/usr/share/ant \
+	&& echo $ANT_HOME
 #	&& ps -ef|grep kafka
+
+#RUN cp lib/libopencv_java320.so /usr/lib/x86_64-linux-gnu/
+# mkdir /opencv-java-bin \
+#	cp bin/opencv-320.jar lib/libopencv_java320.so /opencv-java-bin/ \
 
 RUN mkdir Repo \
 	&& cd Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
 	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
-	&& mvn clean \
-	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false -Djava.library.path=/opencv/build/lib
+#	&& mvn clean \	
+	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false 
+#	-Djava.library.path=/opencv/build/lib	

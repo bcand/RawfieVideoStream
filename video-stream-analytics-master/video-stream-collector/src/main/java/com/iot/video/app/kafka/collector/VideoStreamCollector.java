@@ -46,6 +46,7 @@ public class VideoStreamCollector {
 		}
 		logger.info("Total urls to process "+urls.length);
 		for(int i=0;i<urls.length;i++){
+			logger.info("Video url: "+urls[1]);
 			Thread t = new Thread(new VideoEventGenerator(ids[i].trim(),urls[i].trim(),producer,topic));
 			t.start();
 		}
