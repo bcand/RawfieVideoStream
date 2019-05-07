@@ -84,10 +84,10 @@ RUN wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip \
 
 
 # Install Spark
-RUN wget http://apache.otenet.gr/dist/spark/spark-2.4.2/spark-2.4.2-bin-hadoop2.7.tgz \
-	&& tar -xvzf spark-2.4.2-bin-hadoop2.7.tgz \
-	&& mv spark-2.4.2-bin-hadoop2.7 /usr/local/ \
-	&& ln -s /usr/local/spark-2.4.2-bin-hadoop2.7/ /usr/local/spark 
+RUN wget http://apache.otenet.gr/dist/spark/spark-2.4.3/spark-2.4.3-bin-hadoop2.7.tgz \
+	&& tar -xvzf spark-2.4.3-bin-hadoop2.7.tgz \
+	&& mv spark-2.4.3-bin-hadoop2.7 /usr/local/ \
+	&& ln -s /usr/local/spark-2.4.-bin-hadoop2.7/ /usr/local/spark 
 
 ENV SPARK_HOME /usr/local/spark
 
