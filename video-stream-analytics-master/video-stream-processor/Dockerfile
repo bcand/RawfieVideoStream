@@ -113,5 +113,5 @@ RUN mkdir Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
 	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-processor \
 #	&& mvn clean \	
-	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.spark.processor.VideoStreamProcessor"
+#	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.spark.processor.VideoStreamProcessor"
 #	-Djava.library.path=/opencv/build/lib	
