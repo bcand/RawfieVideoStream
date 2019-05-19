@@ -123,6 +123,6 @@ RUN mkdir Repo \
 	&& cd Repo \
 	&& git clone https://github.com/bcand/RawfieVideoStream.git \
 	&& cd RawfieVideoStream/video-stream-analytics-master/video-stream-collector \
-	&& mvn clean install \
-	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false 
+#	&& mvn clean install \
+#	&& mvn clean package exec:java -Dexec.mainClass="com.iot.video.app.kafka.collector.VideoStreamCollector" -Dexec.cleanupDaemonThreads=false 
 #	-Djava.library.path=/opencv/build/lib	
